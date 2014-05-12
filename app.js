@@ -40,15 +40,32 @@ var EXAMPLE_STATE = {
 var FolderList = React.createClass({
   render: function() {
     return React.DOM.div({className: 'folder-list'},
-      React.DOM.p(null, 'This will be the folder list'));
+      'This will be the folder list');
+  }
+});
+
+var Note = React.createClass({
+  render: function() {
+    // TODO
+    return React.DOM.div({className: 'note'}, 'Note goes here');
+  }
+});
+
+var FilterableNoteList = React.createClass({
+  render: function() {
+    // TODO
+    return React.DOM.div({className: 'filterable-note-list'},
+      'Filterable note list goes here, yo');
   }
 });
 
 var ContentPane = React.createClass({
   render: function() {
     return React.DOM.div({className: 'content-pane'},
-      React.DOM.p(null, 'This will be the content pane',
-        React.DOM.br(), 'And what it holds I can\'t explain'));
+      this.props.viewType === 'list' ?
+        FilterableNoteList(_.pick(this.props, 'notes', 'folder',
+                                              'searchText')) :
+        Note(_.pick(this.props, 'note')));
   }
 });
 
