@@ -1,0 +1,20 @@
+#app {
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 3.5em;
+}
+
+.folder-list {
+  background-color: #eceeee;
+  margin: 0 0.5em 2em;
+  padding: 0 0.5em;
+}
+
+.content-pane {
+  background-color: #eeecee;
+  margin: 0 0.5em 2em;
+  padding: 0 0.5em;
+}

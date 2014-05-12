@@ -1,0 +1,31 @@
+Components:
+
+* App - the whole app
+  * FolderList - shows "Main", "Archive", "Trash", bolding the
+    folder you're currently listing notes in (if any)
+  * ContentPane - holds either a NoteList, if listing notes in a
+    folder, or a Note if viewing/editing a single note
+    * Note - lets you edit a note, or archive/trash it
+      * Text box to view and edit note
+      * Archive and Trash buttons
+    * FilterableNoteList - lists notes in a folder
+      * Button to create a new note
+      * SearchBox - lets you type search terms to filter notes
+      * NoteSummaryList - lists notes in folder which match search
+        term
+        * NoteSummary - shows a possibly abbreviated view of a note,
+          which can be clicked to bring up a full, editable view
+
+
+Pure CSS side-note: How do they do the thing where I can create, say,
+a 3-column layout of equally width columns that stays that way
+regardless of the overall width? For example, the pricing layout:
+
+http://purecss.io/layouts/pricing/
+
+has max-width: 980px on the pricing row (with 3 columns). The
+resulting width could be anything (in a range from whatever width it
+becomes columnar at, to 980). How do they set each column to a third
+of that? Wouldn't they have to set width: XXXpx and adjust it with
+JavaScript (which is clearly not going on)? I want to see how this
+feat is accomplished.
