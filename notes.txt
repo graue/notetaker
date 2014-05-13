@@ -29,3 +29,10 @@ becomes columnar at, to 980). How do they set each column to a third
 of that? Wouldn't they have to set width: XXXpx and adjust it with
 JavaScript (which is clearly not going on)? I want to see how this
 feat is accomplished.
+
+
+Hmm... should the search text be prop or state? Seemingly it *has* to
+be a prop, since a parent component - FilterableNoteList - needs to
+know it. But it also seemingly should be state because the component's
+event handlers may change it to trigger a UI update. Maybe I need to
+do more reading here.
