@@ -51,11 +51,40 @@ var Note = React.createClass({
   }
 });
 
-var FilterableNoteList = React.createClass({
+var SearchBox = React.createClass({
   render: function() {
     // TODO
+    return React.DOM.form({className: 'pure-form'},
+      React.DOM.input({className: 'search-box'}));
+  }
+});
+
+var NoteSummary = React.createClass({
+  render: function() {
+    return React.DOM.p({className: 'note-summary'},
+      this.props.text);
+  }
+});
+
+var NoteSummaryList = React.createClass({
+  render: function() {
+    var folder = this.props.folder;
+    return React.DOM.div({className: 'note-summary-list'},
+      this.props.notes.filter(function(note) {
+        return note.folder === folder;
+      }).map(function(note) {
+        return NoteSummary(note);
+      }));
+  }
+});
+
+var FilterableNoteList = React.createClass({
+  render: function() {
     return React.DOM.div({className: 'filterable-note-list'},
-      'Filterable note list goes here, yo');
+      React.DOM.button({className: 'pure-button new-note-button'},
+                       'New Note'),
+      SearchBox(_.pick(this.props, 'searchText')),
+      NoteSummaryList(_.pick(this.props, 'notes', 'folder', 'searchText')));
   }
 });
 

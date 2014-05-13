@@ -18,3 +18,19 @@ h1 {
   margin: 0 0.5em 2em;
   padding: 0 0.5em;
 }
+
+.new-note-button {
+  float: left;
+}
+
+.search-box {
+  float: right;
+}
+
+.note-summary-list {
+  clear: both;
+}
+
+.note-summary {
+  white-space: pre-wrap;
+}
