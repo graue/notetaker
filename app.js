@@ -45,7 +45,7 @@ var FolderList = React.createClass({
     return React.DOM.ul({className: 'folder-list'},
       FOLDERS.map(function(folder) {
         var classes = folder === activeFolder ? 'active-folder' : '';
-        return React.DOM.li({className: classes},
+        return React.DOM.li({className: classes, key: folder},
           React.DOM.a({href: '#/' + folder}, folder));
       }));
   }
@@ -80,7 +80,7 @@ var NoteSummaryList = React.createClass({
       this.props.notes.filter(function(note) {
         return note.folder === folder;
       }).map(function(note) {
-        return NoteSummary(note);
+        return NoteSummary(_.extend({key: note.id}, note));
       }));
   }
 });
