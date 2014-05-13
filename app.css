@@ -44,3 +44,20 @@ h1 {
   max-height: 5.5em;
   overflow: hidden;
 }
+
+.folder-list {
+  margin-top: 0;
+  list-style-type: none;
+}
+
+.folder-list li {
+  text-transform: capitalize;
+}
+
+.folder-list a {
+  text-decoration: none;
+}
+
+.active-folder {
+  font-weight: bold;
+}

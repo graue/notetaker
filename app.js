@@ -37,10 +37,17 @@ var EXAMPLE_STATE = {
   note: '4' // only used if viewType 'note'
 };
 
+var FOLDERS = ['main', 'archive', 'trash'];
+
 var FolderList = React.createClass({
   render: function() {
-    return React.DOM.div({className: 'folder-list'},
-      'This will be the folder list');
+    var activeFolder = this.props.folder;
+    return React.DOM.ul({className: 'folder-list'},
+      FOLDERS.map(function(folder) {
+        var classes = folder === activeFolder ? 'active-folder' : '';
+        return React.DOM.li({className: classes},
+          React.DOM.a({href: '#/' + folder}, folder));
+      }));
   }
 });
 
