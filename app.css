@@ -16,7 +16,11 @@ h1 {
 .content-pane {
   background-color: #eeecee;
   margin: 0 0.5em 2em;
-  padding: 0 0.5em;
+  padding: 0 0.5em 0.25em;
+}
+
+.new-note-button, .search-box {
+  margin: 0.5em 0 1em;
 }
 
 .new-note-button {
@@ -29,8 +33,14 @@ h1 {
 
 .note-summary-list {
   clear: both;
+  margin: 1em 0;
 }
 
 .note-summary {
+  background-color: #dddbdd;
   white-space: pre-wrap;
+  margin: 0.5em;
+  padding: 0.25em;
+  max-height: 5.5em;
+  overflow: hidden;
 }
