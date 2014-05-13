@@ -33,7 +33,6 @@ var EXAMPLE_STATE = {
   notes: EXAMPLE_NOTES,
   viewType: 'list', // or 'note'
   folder: 'main', // only used if viewType 'list'
-  searchText: '', // only used if viewType 'list'
   note: '4' // only used if viewType 'note'
 };
 
@@ -59,10 +58,16 @@ var Note = React.createClass({
 });
 
 var SearchBox = React.createClass({
+  handleChange: function(event) {
+    this.props.onTextChange(event.target.value);
+  },
   render: function() {
-    // TODO
     return React.DOM.form({className: 'pure-form'},
-      React.DOM.input({className: 'search-box'}));
+      React.DOM.input({
+        className: 'search-box',
+        defaultValue: this.props.searchText,
+        onChange: this.handleChange
+      }));
   }
 });
 
@@ -77,21 +82,36 @@ var NoteSummaryList = React.createClass({
   render: function() {
     var folder = this.props.folder;
     return React.DOM.div({className: 'note-summary-list'},
-      this.props.notes.filter(function(note) {
-        return note.folder === folder;
-      }).map(function(note) {
+      this.props.notes.map(function(note) {
         return NoteSummary(_.extend({key: note.id}, note));
       }));
   }
 });
 
 var FilterableNoteList = React.createClass({
+  getInitialState: function() {
+    return {searchText: ''};
+  },
+  setSearchText: function(newText) {
+    this.setState({searchText: newText.trim().toLowerCase()});
+  },
   render: function() {
+    var searchText = this.state.searchText;
+    var folder = this.props.folder;
+    var filteredNotes = this.props.notes.filter(function(note) {
+      return (note.folder === folder &&
+              (!searchText ||
+               note.text.toLowerCase().indexOf(searchText) !== -1));
+    });
+
     return React.DOM.div({className: 'filterable-note-list'},
       React.DOM.button({className: 'pure-button new-note-button'},
                        'New Note'),
-      SearchBox(_.pick(this.props, 'searchText')),
-      NoteSummaryList(_.pick(this.props, 'notes', 'folder', 'searchText')));
+      SearchBox({
+        searchText: this.state.searchText,
+        onTextChange: this.setSearchText
+      }),
+      NoteSummaryList({notes: filteredNotes}));
   }
 });
 
