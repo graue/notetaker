@@ -19,11 +19,19 @@ h1 {
   padding: 0 0.5em 0.25em;
 }
 
-.new-note-button, .search-box {
-  margin: 0.5em 0 1em;
+.controls button, .search-box {
+  margin: 0.5em 0.5em 1em;
 }
 
 .new-note-button {
+  float: left;
+}
+
+.note .controls {
+  float: right;
+}
+
+.note-header-text {
   float: left;
 }
 
@@ -43,15 +51,21 @@ h1 {
   padding: 0.25em;
   max-height: 5.5em;
   overflow: hidden;
+  cursor: pointer;
+  border: 2px solid #dddbdd;
+}
+
+.note-summary:hover {
+  border: 2px solid #343434;
+}
+
+.note-edit {
+  height: 30em;
 }
 
 .folder-list {
   margin-top: 0;
   list-style-type: none;
-}
-
-.folder-list li {
-  text-transform: capitalize;
 }
 
 .folder-list a {

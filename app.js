@@ -29,14 +29,12 @@ var EXAMPLE_NOTES = [
   }
 ];
 
-var EXAMPLE_STATE = {
-  notes: EXAMPLE_NOTES,
-  viewType: 'list', // or 'note'
-  folder: 'main', // only used if viewType 'list'
-  note: '4' // only used if viewType 'note'
-};
-
 var FOLDERS = ['main', 'archive', 'trash'];
+
+function capitalize(str) {
+  if (str.length === 0) return str;
+  return str.charAt(0).toUpperCase() + str.substr(1);
+}
 
 var FolderList = React.createClass({
   render: function() {
@@ -45,15 +43,66 @@ var FolderList = React.createClass({
       FOLDERS.map(function(folder) {
         var classes = folder === activeFolder ? 'active-folder' : '';
         return React.DOM.li({className: classes, key: folder},
-          React.DOM.a({href: '#/' + folder}, folder));
+          React.DOM.a({href: '#/' + folder}, capitalize(folder)));
       }));
   }
 });
 
 var Note = React.createClass({
+  changeNote: function(key, value) {
+    var id = this.props.id;
+    _.defer(function() {
+      dispatch({
+        action: 'noteChange',
+        id: id,
+        key: key,
+        value: value
+      });
+    });
+  },
+
+  saveText: _.debounce(function(newText) {
+    this.changeNote('text', newText);
+  }, 500),
+
+  handleChange: function(event) {
+    this.saveText(event.target.value);
+  },
+
+  setFolderTo: function(folder) {
+    var oldFolder = this.props.folder;
+    this.changeNote('folder', folder);
+    _.defer(function() {
+      // FIXME: should go through dispatcher
+      router.setRoute(oldFolder);
+    });
+  },
+
+  handleTrash: function() {
+    this.setFolderTo('trash');
+  },
+
+  handleArchive: function() {
+    this.setFolderTo('archive');
+  },
+
   render: function() {
-    // TODO
-    return React.DOM.div({className: 'note'}, 'Note goes here');
+    return React.DOM.div({className: 'note'},
+      React.DOM.div({className: 'controls'},
+        React.DOM.button({className: 'pure-button archive-button',
+                          onClick: this.handleArchive},
+                         'Archive'),
+        React.DOM.button({className: 'pure-button trash-button',
+                          onClick: this.handleTrash},
+                         'Trash')),
+      React.DOM.p({className: 'note-header-text'},
+                   'Noted ', this.props.created),
+      React.DOM.form({className: 'pure-form'},
+        React.DOM.textarea({
+          className: 'note-edit pure-input-1',
+          defaultValue: this.props.text,
+          onChange: this.handleChange
+        })));
   }
 });
 
@@ -72,8 +121,13 @@ var SearchBox = React.createClass({
 });
 
 var NoteSummary = React.createClass({
+  handleClick: function() {
+    // FIXME: to be Flux-y, this should go through a dispatcher to prevent
+    // possible infinite loops, if I've understood Flux correctly.
+    router.setRoute('note/' + this.props.id);
+  },
   render: function() {
-    return React.DOM.p({className: 'note-summary'},
+    return React.DOM.p({className: 'note-summary', onClick: this.handleClick},
       this.props.text);
   }
 });
@@ -105,12 +159,13 @@ var FilterableNoteList = React.createClass({
     });
 
     return React.DOM.div({className: 'filterable-note-list'},
-      React.DOM.button({className: 'pure-button new-note-button'},
-                       'New Note'),
-      SearchBox({
-        searchText: this.state.searchText,
-        onTextChange: this.setSearchText
-      }),
+      React.DOM.div({className: 'controls'},
+        React.DOM.button({className: 'pure-button new-note-button'},
+                        'New Note'),
+        SearchBox({
+          searchText: this.state.searchText,
+          onTextChange: this.setSearchText
+        })),
       NoteSummaryList({notes: filteredNotes}));
   }
 });
@@ -121,20 +176,59 @@ var ContentPane = React.createClass({
       this.props.viewType === 'list' ?
         FilterableNoteList(_.pick(this.props, 'notes', 'folder',
                                               'searchText')) :
-        Note(_.pick(this.props, 'note')));
+        Note(_.where(this.props.notes, {id: this.props.noteId})[0]));
   }
 });
 
 var App = React.createClass({
+  getInitialState: function() {
+    return {
+      notes: EXAMPLE_NOTES,
+      viewType: 'list', // or 'note'
+      folder: 'main', // only used if viewType 'list'
+      noteId: '4' // only used if viewType 'note'
+    };
+  },
+
+  setNote: function(id, key, value) {
+    var notes = _.clone(this.state.notes);
+    for (var i = 0; i < notes.length; i++) {
+      if (notes[i].id === id) {
+        notes[i] = _.clone(notes[i]);
+        notes[i][key] = value;
+      }
+    }
+    this.setState({notes: notes});
+  },
+
   render: function() {
     return React.DOM.div(null,
       React.DOM.div({className: 'pure-u-1-5'},
-        FolderList(_.pick(this.props, 'viewType', 'folder'))),
+        FolderList(this.state.viewType === 'list' ?
+                   {folder: this.state.folder}
+                   : null)),
       React.DOM.div({className: 'pure-u-4-5'},
-        ContentPane(_.pick(this.props, 'notes', 'viewType', 'folder',
-                                       'searchText', 'note'))));
+        ContentPane(_.pick(this.state, 'notes', 'viewType', 'folder',
+                                       'noteId'))));
   }
 });
 
 var reactEl = document.getElementById('react-container');
-React.renderComponent(App(EXAMPLE_STATE), reactEl);
+var mountedApp = React.renderComponent(App(), reactEl);
+
+function dispatch(uiEvent) {
+  if (uiEvent.action === 'noteChange') {
+    mountedApp.setNote(uiEvent.id, uiEvent.key, uiEvent.value);
+  }
+}
+
+var router = Router({
+  '/(main|archive|trash|)': function(folder) {
+    mountedApp.setState({viewType: 'list', folder: folder || 'main'});
+  },
+  '/note/:id': function(id) {
+    mountedApp.setState({viewType: 'note', noteId: id});
+  }
+});
+
+router.init();
