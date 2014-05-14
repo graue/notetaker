@@ -53,21 +53,8 @@ var FolderList = React.createClass({
 });
 
 var Note = React.createClass({
-  changeNote: function(key, value) {
-    var id = this.props.id;
-    // FIXME: don't defer
-    _.defer(function() {
-      dispatch({
-        action: 'noteChange',
-        id: id,
-        key: key,
-        value: value
-      });
-    });
-  },
-
   saveText: _.debounce(function(newText) {
-    this.changeNote('text', newText);
+    dispatch({action: 'noteEdit', id: this.props.id, text: newText});
   }, 500),
 
   handleChange: function(event) {
@@ -76,11 +63,11 @@ var Note = React.createClass({
 
   setFolderTo: function(folder) {
     var oldFolder = this.props.folder;
-    this.changeNote('folder', folder);
-    // FIXME: don't defer
-    _.defer(function() {
-      // FIXME: should go through dispatcher
-      router.setRoute(oldFolder);
+    dispatch({
+      action: 'moveToFolder',
+      id: this.props.id,
+      folder: folder,
+      viewNext: oldFolder
     });
   },
 
@@ -235,9 +222,15 @@ var reactEl = document.getElementById('react-container');
 var mountedApp = React.renderComponent(App(), reactEl);
 
 function dispatch(uiEvent) {
+  var args = arguments;
   _.defer(function() {
-    if (uiEvent.action === 'noteChange') {
-      mountedApp.setNote(uiEvent.id, uiEvent.key, uiEvent.value);
+    if (uiEvent.action === 'noteEdit') {
+      mountedApp.setNote(uiEvent.id, 'text', uiEvent.text);
+    } else if (uiEvent.action === 'moveToFolder') {
+      mountedApp.setNote(uiEvent.id, 'folder', uiEvent.folder);
+      if (uiEvent.viewNext) {
+        router.setRoute('/' + uiEvent.viewNext);
+      }
     } else if (uiEvent.action === 'newNote') {
       var newNoteId = mountedApp.addNewNote();
       router.setRoute('/note/' + newNoteId);
