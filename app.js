@@ -1,3 +1,7 @@
+var _ = require('underscore');
+var React = require('react');
+var Router = require('director').Router;
+
 var EXAMPLE_NOTES = [
   {
     "id": "5",
