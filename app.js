@@ -51,6 +51,7 @@ var FolderList = React.createClass({
 var Note = React.createClass({
   changeNote: function(key, value) {
     var id = this.props.id;
+    // FIXME: don't defer
     _.defer(function() {
       dispatch({
         action: 'noteChange',
@@ -72,6 +73,7 @@ var Note = React.createClass({
   setFolderTo: function(folder) {
     var oldFolder = this.props.folder;
     this.changeNote('folder', folder);
+    // FIXME: don't defer
     _.defer(function() {
       // FIXME: should go through dispatcher
       router.setRoute(oldFolder);
@@ -149,6 +151,9 @@ var FilterableNoteList = React.createClass({
   setSearchText: function(newText) {
     this.setState({searchText: newText.trim().toLowerCase()});
   },
+  handleNewNote: function() {
+    dispatch({action: 'newNote'});
+  },
   render: function() {
     var searchText = this.state.searchText;
     var folder = this.props.folder;
@@ -160,7 +165,8 @@ var FilterableNoteList = React.createClass({
 
     return React.DOM.div({className: 'filterable-note-list'},
       React.DOM.div({className: 'controls'},
-        React.DOM.button({className: 'pure-button new-note-button'},
+        React.DOM.button({className: 'pure-button new-note-button',
+                          onClick: this.handleNewNote},
                         'New Note'),
         SearchBox({
           searchText: this.state.searchText,
@@ -201,6 +207,22 @@ var App = React.createClass({
     this.setState({notes: notes});
   },
 
+  // Adds a new empty note, returning the note's generated ID.
+  addNewNote: function() {
+    var notes = _.clone(this.state.notes);
+    var id = (Math.random() * 2147483647) >> 0; // FIXME: use real UUID
+    id += '';
+    notes.push({
+      id: id,
+      folder: 'main',
+      created: new Date().toISOString(),
+      modified: new Date().toISOString(),
+      text: ''
+    });
+    this.setState({notes: notes});
+    return id;
+  },
+
   render: function() {
     return React.DOM.div(null,
       React.DOM.div({className: 'pure-u-1-5'},
@@ -217,9 +239,14 @@ var reactEl = document.getElementById('react-container');
 var mountedApp = React.renderComponent(App(), reactEl);
 
 function dispatch(uiEvent) {
-  if (uiEvent.action === 'noteChange') {
-    mountedApp.setNote(uiEvent.id, uiEvent.key, uiEvent.value);
-  }
+  _.defer(function() {
+    if (uiEvent.action === 'noteChange') {
+      mountedApp.setNote(uiEvent.id, uiEvent.key, uiEvent.value);
+    } else if (uiEvent.action === 'newNote') {
+      var newNoteId = mountedApp.addNewNote();
+      router.setRoute('/note/' + newNoteId);
+    }
+  });
 }
 
 var router = Router({
