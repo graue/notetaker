@@ -80,22 +80,14 @@ var Note = React.createClass({
     });
   },
 
-  handleTrash: function() {
-    this.setFolderTo('trash');
-  },
-
-  handleArchive: function() {
-    this.setFolderTo('archive');
-  },
-
   render: function() {
     return React.DOM.div({className: 'note'},
       React.DOM.div({className: 'controls'},
         React.DOM.button({className: 'pure-button archive-button',
-                          onClick: this.handleArchive},
+                          onClick: this.setFolderTo.bind(this, 'archive')},
                          'Archive'),
         React.DOM.button({className: 'pure-button trash-button',
-                          onClick: this.handleTrash},
+                          onClick: this.setFolderTo.bind(this, 'trash')},
                          'Trash')),
       React.DOM.p({className: 'note-header-text'},
                    'Noted ', this.props.created),
