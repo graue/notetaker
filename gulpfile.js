@@ -3,7 +3,7 @@ var source = require('vinyl-source-stream');
 var watchify = require('watchify');
 
 gulp.task('watch', function() {
-  var bundler = watchify('./app.js');
+  var bundler = watchify('./js/app.js');
   bundler.on('update', rebundle);
 
   function rebundle() {

@@ -36,3 +36,35 @@ be a prop, since a parent component - FilterableNoteList - needs to
 know it. But it also seemingly should be state because the component's
 event handlers may change it to trigger a UI update. Maybe I need to
 do more reading here.
+
+
+5/16 - I'm (as usual) trying to do too many things at once: convert
+the app to Flux architecture with a dispatcher and stores, while also
+adding PouchDB support. I think the way this will eventually come
+together is I want to make a PouchDB design document for a view sorted
+first by folder, then by time - for quick display of folders. But
+that's a little too much to think about right now.
+
+The Flux TodoMVC example is a little tricky to adapt to PouchDB
+because with Pouch all reads and writes from the store will be
+asynchronous (as with the underlying IndexedDB API).
+
+Confession: I don't understand why the Flux example Dispatcher uses
+promises. Why must it be async?
+
+This is vexing me... how am I gonna make React work sensibly when all
+of my local data (notes) can only be accessed asynchronously? Having
+to wait for an async callback to be called complicates each component
+(it must either render twice, or be a controller-view that listens on
+DB changes and re-renders itself only once the data is in). The
+obvious solution is to have one controller-view at the root that gets
+all the async data, *then* renders itself and its children, passing
+down the needed data to each children. But this makes e.g. the No...
+hmm. Maybe just do this actually. Was going to say it makes the note
+list and note view less self-contained, but I guess they don't need to
+do their own queries.
+
+CouchDB doesn't support partial updates without some extra work,
+currently: http://wiki.apache.org/couchdb/Partial_Updates so without
+any explicit mention in the docs, I assume PouchDB doesn't, either.
+Boo.

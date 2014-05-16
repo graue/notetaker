@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "director": "^1.2.3",
+    "es6-promise": "^1.0.0",
     "pouchdb": "^2.2.0",
     "react": "^0.10.0",
     "underscore": "^1.6.0"
