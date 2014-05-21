@@ -10,9 +10,8 @@ var ContentPane = React.createClass({
   render: function() {
     return React.DOM.div({className: 'content-pane'},
       this.props.viewType === 'list' ?
-        FilterableNoteList(_.pick(this.props, 'notes', 'folder',
-                                              'searchText')) :
-        Note(_.where(this.props.notes, {id: this.props.noteId})[0]));
+        FilterableNoteList(_.pick(this.props, 'folder')) :
+        Note({id: this.props.noteId}));
   }
 });
 

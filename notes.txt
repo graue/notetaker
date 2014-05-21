@@ -68,3 +68,64 @@ CouchDB doesn't support partial updates without some extra work,
 currently: http://wiki.apache.org/couchdb/Partial_Updates so without
 any explicit mention in the docs, I assume PouchDB doesn't, either.
 Boo.
+
+5/19: Ah but the FilterableNoteList does need to do its own queries,
+for searching and pagination. Say we have 5 tiny example notes. OK,
+fine, the controller view at a higher level can pass them on down. But
+then say we have 5 MB of notes. We want to lean on PouchDB to search
+and paginate them, not duplicate the entire database and do that
+ourselves in a view.
+
+OTOH, maybe the FilterableNoteList should itself be a controller-view.
+
+
+5/20: Holy shit! PouchDB loading and saving of notes *works*!
+
+So what I'm doing is to have FilterableNoteList and Note both be
+controller-views. notes and note/rev, respectively, are not props but
+state, at first undefined, set when the async load completes.
+
+Annoying side effect: there's a flash of a loading message before the
+note appears, even when it's locally stored and should be instant. I
+dislike this but dunno what to do. :(
+
+Also, it's not listening for changes, so if you edit the note in a
+different tab, it won't be reflected.
+
+I'm afraid that if I *do* start listening for changes, if I don't do
+it the right way, there will again be that async loading flash, every
+time you change it. But that's silly, right? No need to tear down and
+recreate the component, just listen and .setState() asynchronously.
+
+
+5/21
+
+Just learned: except in "use strict" mode, functions' .bind, .call and
+.apply cannot set the this-value to null or undefined. In that case
+the global object will be used instead.
+
+Also, es6-promise promises seem to silently swallow exceptions thrown
+in my .then() method. Whassup with that. Sure I know it's good
+practice to catch them, but if I don't, I expect to see the stacktrace
+in the console and stuff. Is this a bug in the es6-promise lib on NPM?
+Or crappy expected behavior? This really blows for debugging.
+
+This is expected. Because .then() returns a new Promise and I could
+call .catch() on it in the future. Bluebird mentions this problem
+extensively in its readme and has a heuristic for warning about
+"possibly uncaught" errors. Bleh. Maybe switch to Bluebird then.
+
+
+Another fun issue with React and async: all async calls to .setState()
+must be guarded by an .isMounted() check. If you reload while on a URL
+like:
+
+http://localhost:8000/#/note/FA579020-D8D9-7AA2-968C-1E574B1CD8F1
+
+It renders momentarily with a FilterableNoteList visible before the
+router does its thing and loads a Note component instead. In the
+instant the FNL is visible, it fires an async request, which comes
+back when the FNL is no longer mounted. This behavior is pretty
+consistent, so at least I caught the bug early, but having to
+*manually* guard with .isMounted() all the time seems broken. As I
+proceed I'll have to come up with a general solution here.

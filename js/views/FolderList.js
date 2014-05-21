@@ -2,7 +2,7 @@
 
 var React = require('react');
 
-var FOLDERS = ['main', 'archive', 'test'];
+var FOLDERS = ['main', 'archive', 'trash'];
 
 function capitalize(str) {
   if (str.length === 0) return str;
