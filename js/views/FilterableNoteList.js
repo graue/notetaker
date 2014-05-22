@@ -64,8 +64,7 @@ var FilterableNoteList = React.createClass({
           searchText: this.state.searchText,
           onTextChange: this.setSearchText
         })),
-      this.state.notes ? NoteSummaryList({notes: this.state.notes})
-        : React.DOM.p(null, 'Still loading, hang on...'));
+      NoteSummaryList({notes: this.state.notes || []}));
   }
 });
 

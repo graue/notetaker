@@ -129,3 +129,73 @@ back when the FNL is no longer mounted. This behavior is pretty
 consistent, so at least I caught the bug early, but having to
 *manually* guard with .isMounted() all the time seems broken. As I
 proceed I'll have to come up with a general solution here.
+
+
+Something I hadn't thought about is, when what's displayed on screen
+is being edited in another tab (or in future, on another machine!),
+what should happen? I don't have full operational transform or
+anything (nor was I planning to), so simultaneous editing isn't
+really supported. OTOH, the "changes" we'll be thinking about syncing
+are pretty small... anytime you stop typing for 500ms (I may increase
+that, but to a few seconds max) it's a new "save". So maybe latest
+save wins wouldn't be so bad.
+
+I mean, this is intended to be a single-user app, so this shouldn't
+happen much, except when you just leave the page open on one device,
+forget about it, and edit on a second device. In that case, latest
+save wins is fine.
+
+We also want to update the folder views on an external change. This is
+actually a problem now even on one device due to a race condition:
+
+1. Stop typing in a note (debounce timer is set)
+2. Quickly go back to the folder view
+3. Folder view is rendered without your latest change
+4. Debounce timer fires, change is saved
+
+I find the PouchDB doc for db.changes() particularly inadequate. They
+mention that changes() returns an event emitter that emits 'change',
+'complete', 'create', 'update' and 'delete' events, but say nothing
+about the arguments each passes to event handlers. And the 'complete'
+event happens "when all the changes have been processed"? What does
+that mean, processed by what? And options.live is explained as "Use
+longpoll feed". What does it use otherwise? What would it mean for a
+change listener to not be live?
+
+I guess the example does tell us what arg is passed, if you read
+between the lines. On the db changes emitter,
+
+    .on('change', function(change) { });
+
+is called. So there's one argument. Immediately after that is an
+example response:
+
+    {
+      "id":"somestuff",
+      "seq":21,
+      "changes":[{
+        "rev":"1-8e6e4c0beac3ec54b27d1df75c7183a8"
+      }],
+      "doc":{
+        "title":"Ch-Ch-Ch-Ch-Changes",
+        "_id":"someDocId",
+        "_rev":"1-8e6e4c0beac3ec54b27d1df75c7183a8"
+      }
+    }
+
+So presumably the one argument is an object with that shape, and
+perhaps it's the same for 'create', 'update', and 'delete' (each
+emitting a subset of what 'change' emits)?
+
+'seq' is a sequence number that can be passed to db.changes(), i.e.,
+db.changes({since: 21}), but it's not clear how long-lived the
+sequence number is, what determines if you would get a new sequence?
+Is it global for all changes to the database? If so, that conflicts
+with Couch's philosophy of using UUIDs (rather than counters) for
+revisions to make eventual consistency work.
+
+
+In a totally different area, the "Still loading note list, please
+wait" text bugs me. It flashes for one frame always and looks bad.
+Should probably ditch that, just leave blank, or something to fill
+space. OK, ditched.
