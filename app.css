@@ -39,6 +39,16 @@ h1 {
   float: right;
 }
 
+.search-box span {
+  position: relative;
+  left: 1em;
+  font-size: 1.2em;
+}
+
+#search-input {
+  padding-left: 1em;
+}
+
 .note-summary-list {
   clear: both;
   margin: 1em 0;
