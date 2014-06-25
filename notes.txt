@@ -199,3 +199,38 @@ In a totally different area, the "Still loading note list, please
 wait" text bugs me. It flashes for one frame always and looks bad.
 Should probably ditch that, just leave blank, or something to fill
 space. OK, ditched.
+
+
+5/25: let's make this notes.txt more actionable. After a break, I come
+back to this thinking "What should I do next?" and find a lot of "hmm,
+I should do this, but no, maybe I should do that. Hmm, I don't like
+this feature of PouchDB. Etc." Not very useful.
+
+So, bugs:
+
+* Stop typing in a note, then quickly return to folder list. The
+  summary of the note is stale, and never updates. I need some way to
+  keep track of pending actions and flush before leaving edit mode
+  (which probably means I need to write my own _.debounce analog).
+* Note views should listen to db.changes() and update. They currently
+  don't, which can be seen by editing in another tab.
+* Folder views should also listen to db.changes() and update, visible
+  by editing in another tab.
+
+And some UI warts:
+
+* Search box should have a magnifying glass. I attempted this using
+  Typicons, but it was ugly, partly because I messed up the padding
+  and partly because the typcn-zoom icon is just ugly IMHO. This work
+  can be seen in the crappy-icons branch.
+* Note view should provide an indication what note the folder is in,
+  and a place you can click to return to that folder view.
+* Note view for archived notes should have "Unarchive" and "Trash"
+  buttons.
+* Note view for trashed notes should have a "Restore" (to main)
+  button.
+* The gray backgrounds should go. They were just to aid me in laying
+  things out.
+* The grid is meant to be responsive, but isn't. Am I using Pure
+  incorrectly? Should look into getting the grid and buttons to
+  respond properly to smaller widths.
