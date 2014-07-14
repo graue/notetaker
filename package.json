@@ -4,15 +4,15 @@
   "dependencies": {
     "director": "^1.2.3",
     "es6-promise": "^1.0.0",
-    "pouchdb": "^2.2.0",
+    "pouchdb": "^2.2.3",
     "react": "^0.10.0",
     "underscore": "^1.6.0"
   },
   "devDependencies": {
-    "gulp": "^3.6.2",
+    "gulp": "^3.8.6",
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^0.3.1",
     "vinyl-source-stream": "^0.1.1",
-    "watchify": "^0.9.0"
+    "watchify": "^0.10.2"
   }
 }
