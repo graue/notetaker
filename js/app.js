@@ -18,11 +18,11 @@ var App = React.createClass({
 
   render: function() {
     return React.DOM.div(null,
-      React.DOM.div({className: 'pure-u-1-5'},
+      React.DOM.div({className: 'pure-u-1 pure-u-md-1-5'},
         FolderList(this.state.viewType === 'list' ?
                    {folder: this.state.folder}
                    : null)),
-      React.DOM.div({className: 'pure-u-4-5'},
+      React.DOM.div({className: 'pure-u-1 pure-u-md-4-5'},
         ContentPane(_.pick(this.state, 'viewType', 'folder', 'noteId'))));
   }
 });
