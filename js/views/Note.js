@@ -5,11 +5,14 @@ var React = require('react');
 
 var Dispatcher = require('../Dispatcher');
 var NoteStore = require('../NoteStore');
+var PendingTasksMixin = require('./mixins/PendingTasksMixin');
 
 var Note = React.createClass({
   propTypes: {
     id: React.PropTypes.string.isRequired
   },
+
+  mixins: [PendingTasksMixin],
 
   getInitialState: function() {
     // Logically props, but loaded asynchronously, so we don't have these
@@ -20,14 +23,14 @@ var Note = React.createClass({
     };
   },
 
-  saveText: _.debounce(function(newText) {
+  saveText: function(newText) {
     Dispatcher.handleViewAction({
       actionType: 'EDIT_NOTE',
       newContents: _.defaults({text: newText}, this.state.note),
       id: this.props.id,
       rev: this.state.rev
     });
-  }, 500),
+  },
 
   handleChange: function(event) {
     this.saveText(event.target.value);
@@ -69,6 +72,13 @@ var Note = React.createClass({
 
   componentDidMount: function() {
     var that = this;
+
+    // FIXME: better way to use debounce from the PendingTasksMixin?
+    // We can't call debounce at the call site b/c then we get a different
+    // debounced function for every call -> useless. But we can't call it
+    // during the definition either, because `this` doesn't exist.
+    // Here's the hacky workaround - do it at mount time.
+    this.saveText = this.debounce(this.saveText, 500, true);
 
     NoteStore.getById(this.props.id).then(function(response) {
       if (!that.isMounted()) return;
