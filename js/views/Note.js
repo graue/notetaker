@@ -46,8 +46,7 @@ var Note = React.createClass({
 
   render: function() {
     if (!this.state.note) {
-      return React.DOM.div({className: 'note'},
-        'Hang on, the note is still loading...');
+      return React.DOM.div({className: 'note'}, '');
     }
 
     return React.DOM.div({className: 'note'},
